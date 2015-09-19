@@ -10,6 +10,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    setWindowTitle("Visual Matrix Multiplication");
 
     restart();
 
@@ -131,6 +132,20 @@ void MainWindow::multiplyStep()
                     currB = _matrixB->get(_currentK, _currentJ);
                     currC = _matrixC->get(_currentI, _currentJ);
                     _matrixC->set(_currentI, _currentJ, currC+(currA*currB));
+
+                    /* Visual selection */
+                    ui->tableWidget->clearSelection();
+                    ui->tableWidget->item(_currentI, _currentK)->setSelected(true);
+                    ui->tableWidget_2->clearSelection();
+                    ui->tableWidget_2->item(_currentK, _currentJ)->setSelected(true);
+                    std::ostringstream sI, sJ, sK;
+                    sI << "I=" << _currentI+1;
+                    sJ << "J=" << _currentJ+1;
+                    sK << "K=" << _currentK+1;
+                    ui->label_currI->setText(sI.str().c_str());
+                    ui->label_currJ->setText(sJ.str().c_str());
+                    ui->label_currK->setText(sK.str().c_str());
+
                     _currentK++;
                 } else {
                     _currentK = 0;
@@ -141,6 +156,20 @@ void MainWindow::multiplyStep()
                         currB = _matrixB->get(_currentK, _currentJ);
                         currC = _matrixC->get(_currentI, _currentJ);
                         _matrixC->set(_currentI, _currentJ, currC+(currA*currB));
+
+                        /* Visual selection */
+                        ui->tableWidget->clearSelection();
+                        ui->tableWidget->item(_currentI, _currentK)->setSelected(true);
+                        ui->tableWidget_2->clearSelection();
+                        ui->tableWidget_2->item(_currentK, _currentJ)->setSelected(true);
+                        std::ostringstream sI, sJ, sK;
+                        sI << "I=" << _currentI+1;
+                        sJ << "J=" << _currentJ+1;
+                        sK << "K=" << _currentK+1;
+                        ui->label_currI->setText(sI.str().c_str());
+                        ui->label_currJ->setText(sJ.str().c_str());
+                        ui->label_currK->setText(sK.str().c_str());
+
                         _currentK++;
                     } else {
                         _currentI++;
@@ -151,6 +180,20 @@ void MainWindow::multiplyStep()
                             currB = _matrixB->get(_currentK, _currentJ);
                             currC = _matrixC->get(_currentI, _currentJ);
                             _matrixC->set(_currentI, _currentJ, currC+(currA*currB));
+
+                            /* Visual selection */
+                            ui->tableWidget->clearSelection();
+                            ui->tableWidget->item(_currentI, _currentK)->setSelected(true);
+                            ui->tableWidget_2->clearSelection();
+                            ui->tableWidget_2->item(_currentK, _currentJ)->setSelected(true);
+                            std::ostringstream sI, sJ, sK;
+                            sI << "I=" << _currentI+1;
+                            sJ << "J=" << _currentJ+1;
+                            sK << "K=" << _currentK+1;
+                            ui->label_currI->setText(sI.str().c_str());
+                            ui->label_currJ->setText(sJ.str().c_str());
+                            ui->label_currK->setText(sK.str().c_str());
+
                             _currentK++;
                         } else {
                             // We've finished
@@ -169,6 +212,13 @@ void MainWindow::multiplyStep()
                 currB = _matrixB->get(_currentK, _currentJ);
                 currC = _matrixC->get(_currentI, _currentJ);
                 _matrixC->set(_currentI, _currentJ, currC+(currA*currB));
+
+                /* Visual selection */
+                ui->tableWidget->clearSelection();
+                ui->tableWidget->item(_currentI, _currentK)->setSelected(true);
+                ui->tableWidget_2->clearSelection();
+                ui->tableWidget_2->item(_currentK, _currentJ)->setSelected(true);
+
                 _currentK++;
             }
         }
