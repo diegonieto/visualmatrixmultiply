@@ -20,12 +20,16 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-    void doStep();
+    bool doStep();
 
 
 private slots:
     void on_pushButton_clicked();
     void on_pushButton_2_clicked();
+
+    void on_pushButton_3_clicked();
+
+    void on_pushButton_4_clicked();
 
 private:
     Ui::MainWindow *ui;
@@ -42,9 +46,11 @@ private:
 
     NumericMatrix<NumericType> *_matrixA, *_matrixB, *_matrixC;
 
+    void restart();
+
     void multiplyStep();
 
-    void readValues();
+    bool readValues();
 
     void updateQTableWidgetFromMatrix(QTableWidget &qTableWidget, Matrix<int> &matrix);
 

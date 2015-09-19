@@ -10,15 +10,25 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    restart();
+
+    _matrixA = NULL;
+    _matrixB = NULL;
+    _matrixC = NULL;
+}
+
+void MainWindow::restart()
+{
     _currentI = 0;
     _currentJ = 0;
     _currentK = 0;
     _nrows = ui->tableWidget->rowCount();
     _ncols = ui->tableWidget->columnCount();
     _started = false;
-    _matrixA = NULL;
-    _matrixB = NULL;
-    _matrixC = NULL;
+    _multiplicationDone = false;
+    ui->tableWidget->setEnabled(true);
+    ui->tableWidget_2->setEnabled(true);
 }
 
 MainWindow::~MainWindow()
@@ -31,7 +41,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::readValues()
+bool MainWindow::readValues()
 {
     if ( !_started ) {
         // Allocate memory if necessary
@@ -51,10 +61,22 @@ void MainWindow::readValues()
         {
             for ( unsigned int j=0; j<_ncols; j++ )
             {
-                tmp = ui->tableWidget->item(i,j)->text().toInt();
-                _matrixA->set(i,j,tmp);
-                tmp = ui->tableWidget_2->item(i,j)->text().toInt();
-                _matrixB->set(i,j,tmp);
+                try {
+
+                    if ( ui->tableWidget->item(i,j) != NULL ) {
+                        tmp = ui->tableWidget->item(i,j)->text().toInt();
+                        _matrixA->set(i,j,tmp);
+                    } else
+                        throw -20;
+                    if ( ui->tableWidget_2->item(i,j) != NULL ) {
+                        tmp = ui->tableWidget_2->item(i,j)->text().toInt();
+                        _matrixB->set(i,j,tmp);
+                    } else
+                        throw -20;
+                } catch (int) {
+                    ui->label_2->setText("Please, initialize the matrices");
+                    return false;
+                }
             }
         }
 
@@ -65,39 +87,20 @@ void MainWindow::readValues()
         //ui->tableWidget_3->setEnabled(false);
 
         _started = true;
+        return true;
     }
+    return true;
 }
 
-void MainWindow::doStep()
+bool MainWindow::doStep()
 {
-    readValues();
-
-    multiplyStep();
-
-    updateQTableWidgetFromMatrix(*(ui->tableWidget_3), *_matrixC);
-
-    updateQTableWidgetFromMatrix(*(ui->tableWidget), *_matrixA);
-
-
-    // Multiply
-    //for ( unsigned int i=startI; i<endI; i++ )
-    //int value = ui->tableWidget_2->itemAt(_currentI,_currentK)->text().toInt() * ui->tableWidget_2->itemAt(_currentK, _currentJ)->text().toInt();
-
-    //Point<int> point(_currentI, _currentJ, value);
-
-    //point.getValue();
-
-    //setValueOnCMatrix(ui->tableWidget_3, new Point( _currentI, _currentJ, value));
-
-    {
-        //for ( unsigned int j=startJ; j<endJ; j++ )
-        {
-            //for ( unsigned int k=startK; k<endK; k++ )
-            {
-
-            }
-        }
-    }
+    if ( readValues() ) {
+        ui->label_2->setText("");
+        multiplyStep();
+        updateQTableWidgetFromMatrix(*(ui->tableWidget_3), *_matrixC);
+        return true;
+    } else
+        return false;
 }
 
 void MainWindow::updateQTableWidgetFromMatrix(QTableWidget &qTableWidget, Matrix<int> &matrix)
@@ -116,7 +119,6 @@ void MainWindow::updateQTableWidgetFromMatrix(QTableWidget &qTableWidget, Matrix
     }
 }
 
-
 void MainWindow::multiplyStep()
 {
     // Multiply
@@ -134,44 +136,44 @@ void MainWindow::multiplyStep()
                     _currentK = 0;
                     _currentJ++;
 
-                    currA = _matrixA->get(_currentI, _currentK);
-                    currB = _matrixB->get(_currentK, _currentJ);
-                    currC = _matrixC->get(_currentI, _currentJ);
-                    _matrixC->set(_currentI, _currentJ, currC+(currA*currB));
-                    _currentK++;
+                    if ( _currentJ < _ncols ) {
+                        currA = _matrixA->get(_currentI, _currentK);
+                        currB = _matrixB->get(_currentK, _currentJ);
+                        currC = _matrixC->get(_currentI, _currentJ);
+                        _matrixC->set(_currentI, _currentJ, currC+(currA*currB));
+                        _currentK++;
+                    } else {
+                        _currentI++;
+                        _currentJ = 0;
+                        _currentK = 0;
+                        if ( _currentI < _nrows ) {
+                            currA = _matrixA->get(_currentI, _currentK);
+                            currB = _matrixB->get(_currentK, _currentJ);
+                            currC = _matrixC->get(_currentI, _currentJ);
+                            _matrixC->set(_currentI, _currentJ, currC+(currA*currB));
+                            _currentK++;
+                        } else {
+                            // We've finished
+                            _currentI = 0;
+                            ui->label->setText("Finished");
+                            _multiplicationDone = true;
+                        }
+                    }
                 }
             } else {
                 _currentJ = 0;
+                _currentK = 0;
                 _currentI++;
 
                 currA = _matrixA->get(_currentI, _currentK);
                 currB = _matrixB->get(_currentK, _currentJ);
                 currC = _matrixC->get(_currentI, _currentJ);
                 _matrixC->set(_currentI, _currentJ, currC+(currA*currB));
-                _currentJ++;
-            }
-        } else {
-            // We've finished
-            _currentI = 0;
-            ui->label->setText("Finished");
-            _multiplicationDone = true;
-        }
-    }
-
-/*
-    for ( unsigned int i=startI; i<endI; i++ )
-    {
-        for ( unsigned int j=startJ; j<endJ; j++ )
-        {
-            for ( unsigned int k=startK; k<endK; k++ )
-            {
-                setValueOnCMatrix(ui->tableWidget_3, );
+                _currentK++;
             }
         }
     }
-*/
 }
-
 
 /*
 void setValueOnCMatrix(QTableWidget &qtablewidget, Point &point)
@@ -208,11 +210,26 @@ void fillMatrix(QTableWidget *qtableWidget)
 
 void MainWindow::on_pushButton_clicked()
 {
-    fillMatrix(ui->tableWidget);
-    fillMatrix(ui->tableWidget_2);
+    if ( !_started ) {
+        fillMatrix(ui->tableWidget);
+        fillMatrix(ui->tableWidget_2);
+    }
 }
 
 void MainWindow::on_pushButton_2_clicked()
 {
     doStep();
+}
+
+void MainWindow::on_pushButton_3_clicked()
+{
+    while ( !this->_multiplicationDone ) {
+        if ( !doStep() )
+            break;
+    }
+}
+
+void MainWindow::on_pushButton_4_clicked()
+{
+    restart();
 }
