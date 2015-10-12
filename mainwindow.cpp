@@ -65,12 +65,12 @@ bool MainWindow::readValues()
                 try {
 
                     if ( ui->tableWidget->item(i,j) != NULL ) {
-                        tmp = ui->tableWidget->item(i,j)->text().toInt();
+                        tmp = ui->tableWidget->item(i,j)->text().toDouble();
                         _matrixA->set(i,j,tmp);
                     } else
                         throw -20;
                     if ( ui->tableWidget_2->item(i,j) != NULL ) {
-                        tmp = ui->tableWidget_2->item(i,j)->text().toInt();
+                        tmp = ui->tableWidget_2->item(i,j)->text().toDouble();
                         _matrixB->set(i,j,tmp);
                     } else
                         throw -20;
@@ -104,7 +104,7 @@ bool MainWindow::doStep()
         return false;
 }
 
-void MainWindow::updateQTableWidgetFromMatrix(QTableWidget &qTableWidget, Matrix<int> &matrix)
+void MainWindow::updateQTableWidgetFromMatrix(QTableWidget &qTableWidget, Matrix<NumericType> &matrix)
 {
     for ( unsigned int i=0; i<_nrows; i++ )
     {

@@ -39,7 +39,7 @@ private:
     unsigned int _currentK;
     unsigned int _nrows;
     unsigned int _ncols;
-    typedef int NumericType;
+    typedef double NumericType;
 
     bool _started;
     bool _multiplicationDone;
@@ -52,7 +52,7 @@ private:
 
     bool readValues();
 
-    void updateQTableWidgetFromMatrix(QTableWidget &qTableWidget, Matrix<int> &matrix);
+    void updateQTableWidgetFromMatrix(QTableWidget &qTableWidget, Matrix<NumericType> &matrix);
 
 };
 
